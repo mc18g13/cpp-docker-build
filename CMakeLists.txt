@@ -10,17 +10,17 @@ set(CMAKE_CXX_STANDARD 17)
 project(cpp_test)
 
 file(GLOB_RECURSE LIB_SOURCE
-  lib/*.cpp*
+  lib/**/*.cpp*
 )
 
 add_executable(cpp_test
   main.cpp
 )
 
-# target_include_directories(
-#   cpp_test PRIVATE 
-#   lib/cmsis/include/dsp
-#   )
+target_include_directories(
+  cpp_test PRIVATE
+  lib/logger
+)
 
 # target_compile_definitions(cpp_test PUBLIC ARM_MATH_CM0PLUS)
 

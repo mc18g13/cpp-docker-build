@@ -27,14 +27,24 @@ docker-push:: check-docker ## push the docker image
 	@echo Pushing $(IMAGE_TAG)
 	@docker push $(IMAGE_TAG)
 
-DOCKER_BUILD_COMMAND = 	@docker run -t \
+DOCKER_RUN_COMMAND = @docker run \
+	-it --rm \
+	--env USER="${USER}" \
+	--env HOME="${HOME}" \
 	-v $(WORKING_DIR):/$(DOCKER_DIR) \
-	--user "${UID}:${GID}" \
-	-w /$(DOCKER_DIR) $(IMAGE_TAG) bash -C \
+	-w /$(DOCKER_DIR) \
+	$(IMAGE_TAG)
+	
+build:: ## Build the app
+	${DOCKER_RUN_COMMAND}  bash -C \
 	./scripts/build.sh --color=auto
 
-build:: ## Build the firmare
-	${DOCKER_BUILD_COMMAND}
+run:: ## Run the app
+	${DOCKER_RUN_COMMAND} bash -c \
+	ls && ./cmake-build/cpp_test --color=auto
+
+enter::
+	${DOCKER_RUN_COMMAND}
 
 docker-debug:: ## Enter the docker container to debug
 	@echo ${DOCKER_BUILD_COMMAND}
@@ -43,9 +53,6 @@ build-full: docker-build build ## Setup the docker image and build the firmware
 
 clean:
 	rm -rf cmake-build
-
-usb:
-	./scripts/usb_output.sh
 
 # A help target including self-documenting targets (see the awk statement)
 define HELP_TEXT
